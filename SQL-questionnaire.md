@@ -326,9 +326,9 @@ solution: `3`
 ### 25) How many orders did we ship between and including June 2004 & September 2004 ---- CHECK
 
 ```
-SELECT COUNT(status)
+SELECT COUNT(*)
 FROM orders
-WHERE status = 'shipped' BETWEEN '01/01/2004' AND '30/09/2004';
+WHERE status = 'shipped' BETWEEN '01-01-2004' AND '30-09-2004';
 ```
 
 solution: ``
@@ -346,7 +346,7 @@ WHERE contactLastName IN (
 
 solution: `9`
 
-### 27) Give the product code for the most expensive product for the consumer? --- CHECK
+### 27) Give the product code for the most expensive product for the consumer?
 
 ```
 SELECT productCode
@@ -407,7 +407,7 @@ WHERE MSRP - buyPrice < 30;
 
 ```
 
-solution: `23`
+solution: `23 products`
 
 ### 32) What is the product code of our most popular product (in number purchased)?
 
@@ -449,7 +449,7 @@ WHERE productCode IN (
 
 solution: `109`
 
-### 34) Which check number paid for order 10210. Tip: Pay close attention to the date fields on both tables to solve this.
+### 34) Which check number paid for order 10210. Tip: Pay close attention to the date fields on both tables to solve this. --- CHECK
 
 ```
 SELECT checkNumber
@@ -491,7 +491,7 @@ WHERE amount > 5000 AND checkNumber LIKE '%D%9';
 
 solution: `3`
 
-### 38) In which country do we have the most customers that we do not have an office in?
+### 38) In which country do we have the most customers that we do not have an office in? ---CHECK
 
 ```
 SELECT country
@@ -499,7 +499,15 @@ FROM customers
 WHERE country NOT IN (
     SELECT country
     FROM offices
+    ORDER BY COUNT(country) DESC
+);
 
+SELECT COUNT(country) FROM customers
+WHERE country NOT IN (
+    SELECT country
+    FROM offices
+    GROUP BY country
+    ORDER BY COUNT(country) DESC
 );
 ```
 
@@ -543,47 +551,91 @@ solution: `23`
 ### 41) How many employees do we have on average per country (rounded)?
 
 ```
-
+SELECT ROUND(AVG(count))
+FROM (
+    SELECT COUNT(employeeNumber) AS count
+    FROM employees
+    GROUP BY officeCode
+) AS count;
 ```
 
-solution: `<your solution here>`
+solution: `3`
 
 ### 42) What is the total value of all shipped & resolved sales ever combined?
 
 ```
-<Your SQL query here>
+SELECT SUM(quantityOrdered * priceEach)
+FROM orderdetails
+WHERE orderNumber IN (
+    SELECT orderNumber
+    FROM orders
+    WHERE status IN ('shipped', 'resolved')
+);
 ```
 
-solution: `<your solution here>`
+solution: `8999330.52`
 
 ### 43) What is the total value of all shipped & resolved sales in the year 2005 combined? (based on shipping date)
 
 ```
+SELECT SUM(quantityOrdered * priceEach)
+FROM orderdetails
+WHERE orderNumber IN (
+    SELECT orderNumber
+    FROM orders
+    WHERE status IN ('shipped', 'resolved') AND YEAR(shippedDate) = 2005
+);
+```
+
+solution: `1427944.97`
+
+### 44) What was our most profitable year ever (based on shipping date), considering all shipped & resolved orders? ---check
+
+```
+SELECT YEAR(shippedDate), SUM(quantityOrdered * priceEach)
+FROM orders
+WHERE orderNumber IN (
+    SELECT orderNumber
+    FROM orders
+    WHERE status IN ('shipped', 'resolved')
+)
+GROUP BY YEAR(shippedDate)
+ORDER BY SUM(quantityOrdered * priceEach) DESC
+LIMIT 1;
+
+```
+
+solution: `<your solution here>`
+
+### 45) How much revenue did we make on in our most profitable year ever (based on shipping date), considering all shipped & resolved orders? ---check
+
+```
 <Your SQL query here>
 ```
 
 solution: `<your solution here>`
 
-### 44) What was our most profitable year ever (based on shipping date), considering all shipped & resolved orders?
+### 46) What is the name of our biggest customer in the USA of terms of revenue? ---check
 
 ```
-<Your SQL query here>
-```
+SELECT customerName
+FROM customers
+WHERE customerNumber IN (
+    SELECT customerNumber
+    FROM orders
+    WHERE orderNumber IN (
+        SELECT orderNumber
+        FROM orderdetails
+        WHERE orderNumber IN (
+            SELECT orderNumber
+            FROM orders
+            WHERE status IN ('shipped', 'resolved')
+        )
+    )
+) AND country = 'USA'
+GROUP BY customerName
+ORDER BY SUM(quantityOrdered * priceEach) DESC;
 
-solution: `<your solution here>`
-
-### 45) How much revenue did we make on in our most profitable year ever (based on shipping date), considering all shipped & resolved orders?
-
-```
-<Your SQL query here>
-```
-
-solution: `<your solution here>`
-
-### 46) What is the name of our biggest customer in the USA of terms of revenue?
-
-```
-<Your SQL query here>
 ```
 
 solution: `<your solution here>`
@@ -599,24 +651,28 @@ solution: `<your solution here>`
 ### 48) How many customers do we have that never ordered anything?
 
 ```
-<Your SQL query here>
+SELECT COUNT(*)
+FROM customers
+WHERE customerNumber NOT IN (
+    SELECT customerNumber
+    FROM orders
+);
+```
+
+solution: `24`
+
+### 49) What is the last name of our best employee in terms of revenue? --- CHECK
+
+```
+
 ```
 
 solution: `<your solution here>`
 
-### 49) What is the last name of our best employee in terms of revenue?
+### 50) What is the office name of the least profitable office in the year 2004? --- CHECK
 
 ```
 <Your SQL query here>
-```
-
-solution: `<your solution here>`
-
-### 50) What is the office name of the least profitable office in the year 2004?
-
-```
-
-```
 
 ```
 
@@ -625,4 +681,3 @@ solution: `<your solution here>`
 ## Are you done? Amazing!
 
 ![](../_assets/clap-clap-clap.gif)
-```
