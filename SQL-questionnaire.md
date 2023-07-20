@@ -617,7 +617,6 @@ WHERE status IN ('shipped', 'resolved') AND YEAR(shippedDate) IN (
     WHERE status IN ('shipped', 'resolved')
     GROUP BY YEAR(shippedDate)
     ORDER BY SUM('quantityOrdered' * 'priceEach') DESC
-    LIMIT 1
 );
 ```
 
@@ -626,15 +625,9 @@ solution: `<your solution here>`
 ### 45) How much revenue did we make on in our most profitable year ever (based on shipping date), considering all shipped & resolved orders? ---check
 
 ```
-SELECT SUM('quantityOrdered' * 'priceEach')
-FROM orders
-WHERE status IN ('shipped', 'resolved') AND YEAR(shippedDate) IN (
-    SELECT YEAR(shippedDate)
-    FROM orders
-    WHERE status IN ('shipped', 'resolved')
-    GROUP BY YEAR(shippedDate)
-    ORDER BY SUM('quantityOrdered' * 'priceEach') DESC
-);
+
+
+
 ```
 
 solution: `<your solution here>`
@@ -662,10 +655,21 @@ solution: `Signal Gift Stores`
 ### 47) How much has our largest customer inside the USA ordered with us (total value)?
 
 ```
-<Your SQL query here>
+SELECT SUM(quantityOrdered * priceEach)
+FROM orderdetails
+WHERE orderNumber IN (
+    SELECT orderNumber
+    FROM orders
+    WHERE status IN ('shipped', 'resolved') AND customerNumber IN (
+        SELECT customerNumber
+        FROM customers
+        WHERE country = 'USA'
+    ) GROUP BY customerNumber
+    ORDER BY SUM('quantityOrdered' * 'priceEach') DESC
+);
 ```
 
-solution: `<your solution here>`
+solution: `975907.17`
 
 ### 48) How many customers do we have that never ordered anything?
 
@@ -683,10 +687,20 @@ solution: `24`
 ### 49) What is the last name of our best employee in terms of revenue? --- CHECK
 
 ```
-SELE
+SELECT lastName
+FROM employees
+WHERE employeeNumber IN (
+    SELECT employeeNumber
+    FROM orders
+    WHERE status IN ('shipped', 'resolved') AND employeeNumber IN (
+        SELECT employeeNumber
+        FROM employees
+    ) GROUP BY employeeNumber
+    ORDER BY SUM('quantityOrdered' * 'priceEach') DESC
+);
 ```
 
-solution: `<your solution here>`
+solution: `<Murphy>`
 
 ### 50) What is the office name of the least profitable office in the year 2004? --- CHECK
 
