@@ -216,36 +216,33 @@ solution:
 | Resolved | 4 |
 | Shipped | 303 |
 
-### 18) In which countries don't we have any customers?
+### 18) In which countries don't we have any customers? ---CHECK
 
-- [ ] Austria
+Check if Austria, Canada, China, Germany, Greece, Japan, Philippines, South Korea are in the list of countries. If they do not exist print them out.
 
-- [ ] Canada
+- [y] Austria
 
-- [ ] China
+- [y] Canada
 
-- [ ] Germany
+- [n] China
 
-- [ ] Greece
+- [y] Germany
 
-- [ ] Japan
+- [n] Greece
 
-- [ ] Philippines
+- [y] Japan
 
-- [ ] South Korea
+- [y] Philippines
 
-```
-SELECT country
-FROM customers
-WHERE EXISTS(
-    SELECT country
-    FROM customers
-    WHERE country NOT IN ('Austria', 'Canada', 'China', 'Germany', 'Greece', 'Japan', 'Philippines', 'South Korea')
-);
+- [n] South Korea
 
 ```
 
-solution: `<your solution here>`
+
+
+```
+
+solution: `<China, Greece, South Korea>`
 
 ### 19) How many orders where never shipped?
 
@@ -323,15 +320,15 @@ WHERE quantityInStock > 100 AND quantityInStock < 500;
 
 solution: `3`
 
-### 25) How many orders did we ship between and including June 2004 & September 2004 ---- CHECK
+### 25) How many orders did we ship between and including June 2004 & September 2004?
 
 ```
 SELECT COUNT(*)
 FROM orders
-WHERE status = 'shipped' BETWEEN '01-01-2004' AND '30-09-2004';
+WHERE status = 'shipped' AND shippedDate BETWEEN '2004-06-01' AND '2004-09-30';
 ```
 
-solution: ``
+solution: `42`
 
 ### 26) How many customers share the same last name as an employee of ours?
 
@@ -463,11 +460,14 @@ WHERE customerNumber IN (
     FROM orders
     WHERE orderNumber = 10210
 );
+
+SELECT checkNumber
+FROM payments
 ```
 
 solution: `<your solution here>`
 
-### 35) Which order was paid by check CP804873?
+### 35) Which order was paid by check CP804873? --- CHECK
 
 ```
 SELECT orderNumber
@@ -673,6 +673,7 @@ solution: `<your solution here>`
 
 ```
 <Your SQL query here>
+
 
 ```
 
