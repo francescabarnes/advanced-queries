@@ -606,23 +606,15 @@ WHERE orderNumber IN (
 
 solution: `1427944.97`
 
-### 44) What was our most profitable year ever (based on shipping date), considering all shipped & resolved orders? ---check
+### 44) What was our most profitable year ever (based on shipping date), considering all shipped & resolved orders?
 
 ```
-SELECT YEAR(shippedDate)
-FROM orders
-WHERE status IN ('shipped', 'resolved') AND YEAR(shippedDate) IN (
-    SELECT YEAR(shippedDate)
-    FROM orders
-    WHERE status IN ('shipped', 'resolved')
-    GROUP BY YEAR(shippedDate)
-    ORDER BY SUM('quantityOrdered' * 'priceEach') DESC
-);
+
 ```
 
 solution: `<your solution here>`
 
-### 45) How much revenue did we make on in our most profitable year ever (based on shipping date), considering all shipped & resolved orders? ---check
+### 45) How much revenue did we make on in our most profitable year ever (based on shipping date), considering all shipped & resolved orders?
 
 ```
 
@@ -632,7 +624,7 @@ solution: `<your solution here>`
 
 solution: `<your solution here>`
 
-### 46) What is the name of our biggest customer in the USA of terms of revenue? ---check
+### 46) What is the name of our biggest customer in the USA of terms of revenue?
 
 ```
 SELECT customerName
@@ -655,21 +647,11 @@ solution: `Signal Gift Stores`
 ### 47) How much has our largest customer inside the USA ordered with us (total value)?
 
 ```
-SELECT SUM(quantityOrdered * priceEach)
-FROM orderdetails
-WHERE orderNumber IN (
-    SELECT orderNumber
-    FROM orders
-    WHERE status IN ('shipped', 'resolved') AND customerNumber IN (
-        SELECT customerNumber
-        FROM customers
-        WHERE country = 'USA'
-    ) GROUP BY customerNumber
-    ORDER BY SUM('quantityOrdered' * 'priceEach') DESC
-);
+
+
 ```
 
-solution: `975907.17`
+solution: `your solution here`
 
 ### 48) How many customers do we have that never ordered anything?
 
@@ -684,7 +666,7 @@ WHERE customerNumber NOT IN (
 
 solution: `24`
 
-### 49) What is the last name of our best employee in terms of revenue? --- CHECK
+### 49) What is the last name of our best employee in terms of revenue?
 
 ```
 SELECT lastName
@@ -702,7 +684,7 @@ WHERE employeeNumber IN (
 
 solution: `<Murphy>`
 
-### 50) What is the office name of the least profitable office in the year 2004? --- CHECK
+### 50) What is the office name of the least profitable office in the year 2004?
 
 ```
 SELECT city
