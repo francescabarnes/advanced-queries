@@ -237,7 +237,28 @@ Check if Austria, Canada, China, Germany, Greece, Japan, Philippines, South Kore
 - [n] South Korea
 
 ```
-
+SELECT country
+FROM (
+    SELECT 'Austria' AS country
+    UNION ALL
+    SELECT 'Canada'
+    UNION ALL
+    SELECT 'China'
+    UNION ALL
+    SELECT 'Germany'
+    UNION ALL
+    SELECT 'Greece'
+    UNION ALL
+    SELECT 'Japan'
+    UNION ALL
+    SELECT 'Philippines'
+    UNION ALL
+    SELECT 'South Korea'
+) AS country_list
+WHERE country NOT IN (
+    SELECT DISTINCT country
+    FROM customers
+);
 
 
 ```
@@ -449,25 +470,27 @@ solution: `109`
 ### 34) Which check number paid for order 10210. Tip: Pay close attention to the date fields on both tables to solve this. --- CHECK
 
 ```
+
 SELECT checkNumber
 FROM payments
 WHERE customerNumber IN (
     SELECT customerNumber
     FROM orders
     WHERE orderNumber = 10210
-) AND paymentDate IN (
-    SELECT paymentDate
-    FROM orders
-    WHERE orderNumber = 10210
+) AND paymentDate = (
+    SELECT MAX(paymentDate)
+    FROM payments
+    WHERE customerNumber IN (
+        SELECT customerNumber
+        FROM orders
+        WHERE orderNumber = 10210
+    )
 );
-
-SELECT checkNumber
-FROM payments
 ```
 
-solution: `<your solution here>`
+solution: `AU750837`
 
-### 35) Which order was paid by check CP804873? --- CHECK
+### 35) Which order was paid by check CP804873?
 
 ```
 SELECT orderNumber
@@ -477,9 +500,10 @@ WHERE customerNumber IN (
     FROM payments
     WHERE checkNumber = 'CP804873'
 );
+
 ```
 
-solution: `<your solution here>`
+solution: `10108, 10198, 10330`
 
 ### 36) How many payments do we have above 5000 EUR and with a check number with a 'D' somewhere in the check number, ending the check number with the digit 9?
 
@@ -499,19 +523,12 @@ FROM customers
 WHERE country NOT IN (
     SELECT country
     FROM offices
-    ORDER BY COUNT(country) DESC
-);
-
-SELECT COUNT(country) FROM customers
-WHERE country NOT IN (
-    SELECT country
-    FROM offices
-    GROUP BY country
-    ORDER BY COUNT(country) DESC
-);
+) GROUP BY country
+ORDER BY COUNT(country) DESC
+LIMIT 1;
 ```
 
-solution: `<your solution here>`
+solution: `Germany`
 
 ### 39) What city has our biggest office in terms of employees?
 
@@ -592,17 +609,16 @@ solution: `1427944.97`
 ### 44) What was our most profitable year ever (based on shipping date), considering all shipped & resolved orders? ---check
 
 ```
-SELECT YEAR(shippedDate), SUM(quantityOrdered * priceEach)
+SELECT YEAR(shippedDate)
 FROM orders
-WHERE orderNumber IN (
-    SELECT orderNumber
+WHERE status IN ('shipped', 'resolved') AND YEAR(shippedDate) IN (
+    SELECT YEAR(shippedDate)
     FROM orders
     WHERE status IN ('shipped', 'resolved')
-)
-GROUP BY YEAR(shippedDate)
-ORDER BY SUM(quantityOrdered * priceEach) DESC
-LIMIT 1;
-
+    GROUP BY YEAR(shippedDate)
+    ORDER BY SUM('quantityOrdered' * 'priceEach') DESC
+    LIMIT 1
+);
 ```
 
 solution: `<your solution here>`
@@ -610,7 +626,15 @@ solution: `<your solution here>`
 ### 45) How much revenue did we make on in our most profitable year ever (based on shipping date), considering all shipped & resolved orders? ---check
 
 ```
-<Your SQL query here>
+SELECT SUM('quantityOrdered' * 'priceEach')
+FROM orders
+WHERE status IN ('shipped', 'resolved') AND YEAR(shippedDate) IN (
+    SELECT YEAR(shippedDate)
+    FROM orders
+    WHERE status IN ('shipped', 'resolved')
+    GROUP BY YEAR(shippedDate)
+    ORDER BY SUM('quantityOrdered' * 'priceEach') DESC
+);
 ```
 
 solution: `<your solution here>`
@@ -623,22 +647,17 @@ FROM customers
 WHERE customerNumber IN (
     SELECT customerNumber
     FROM orders
-    WHERE orderNumber IN (
-        SELECT orderNumber
-        FROM orderdetails
-        WHERE orderNumber IN (
-            SELECT orderNumber
-            FROM orders
-            WHERE status IN ('shipped', 'resolved')
-        )
-    )
-) AND country = 'USA'
-GROUP BY customerName
-ORDER BY SUM(quantityOrdered * priceEach) DESC;
+    WHERE status IN ('shipped', 'resolved') AND customerNumber IN (
+        SELECT customerNumber
+        FROM customers
+        WHERE country = 'USA'
+    ) GROUP BY customerNumber
+    ORDER BY SUM('quantityOrdered' * 'priceEach') DESC
+);
 
 ```
 
-solution: `<your solution here>`
+solution: `Signal Gift Stores`
 
 ### 47) How much has our largest customer inside the USA ordered with us (total value)?
 
@@ -664,7 +683,7 @@ solution: `24`
 ### 49) What is the last name of our best employee in terms of revenue? --- CHECK
 
 ```
-
+SELE
 ```
 
 solution: `<your solution here>`
@@ -672,12 +691,21 @@ solution: `<your solution here>`
 ### 50) What is the office name of the least profitable office in the year 2004? --- CHECK
 
 ```
-<Your SQL query here>
-
-
+SELECT city
+FROM offices
+WHERE officeCode IN (
+    SELECT officeCode
+    FROM employees
+    WHERE employeeNumber IN (
+        SELECT employeeNumber
+        FROM orders
+        WHERE status IN ('shipped', 'resolved') AND YEAR(shippedDate) = 2004
+    ) GROUP BY officeCode
+    ORDER BY SUM(quantityOrdered * priceEach) ASC
+);
 ```
 
-solution: `<your solution here>`
+solution: `San Francisco`
 
 ## Are you done? Amazing!
 
